@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:MauiAppImageSourceFromFileBug"
+             x:Class="MauiAppImageSourceFromFileBug.MainPage">
+
+    <ContentPage.Resources>
+        <local:NullConverter x:Key="MyNullConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout>
+
+            <!-- Selection view: -->
+            <CollectionView ItemsSource="{Binding Items}"
+                            SelectedItem="{Binding SelectedItem}"
+                            SelectionMode="Single"
+                            Margin="0">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical"
+                                       ItemSpacing="0" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <VerticalStackLayout Padding="15"
+                                             Margin="15">
+                            <Label Text="{Binding Name}" />
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Details view: -->
+            <VerticalStackLayout BindingContext="{Binding SelectedItem}">
+                <Label Text="SelectedItem:" />
+                <Label Text="{Binding Name}" />
+
+                <Image Aspect="AspectFill"
+                       Source="{Binding ImageSource}"
+                       Margin="0, 20, 0, 20">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Setter Property="IsVisible"
+                                    Value="false" />
+                            <Style.Triggers>
+                                <!-- Workaround, because the ImageSource doesn't update after a null value is set -->
+                                <DataTrigger TargetType="Image"
+                                             Binding="{Binding ImageSource, Converter={x:StaticResource MyNullConverter}}"
+                                             Value="false">
+                                    <Setter Property="IsVisible"
+                                            Value="true" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+
+    </ScrollView>
+
+</ContentPage>
